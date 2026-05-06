@@ -1,6 +1,6 @@
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import Chroma
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PDFPlumberLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from dotenv import load_dotenv
 import os
@@ -8,7 +8,7 @@ import os
 def load_cv(pdf_path : str):
     print(f"Load PDF: {pdf_path}")
 
-    loader = PyPDFLoader(pdf_path)
+    loader = PDFPlumberLoader(pdf_path)
     pages = loader.load()
 
     print(f"Pages loaded: {len(pages)}")
@@ -35,6 +35,7 @@ def create_vector_store(chunks):
         model = "models/gemini-embedding-001"
     )
 
+
     #create ChromaDB
     vectorstore = Chroma.from_documents(
         documents = chunks, 
@@ -51,15 +52,14 @@ def search_cv(vectorstore, query:str, k: int = 3):
 
     return results
 
+def analyze_job_description(job_text:str, vectorstore) -> dict:
+    cv_results = search_cv(vectorstore, job_text, k=5)
 
-if __name__ == "__main__":
-    chunks = load_cv('data/cv.pdf')
-    vectorstore = create_vector_store(chunks)
+    cv_context = "\n\n".join([doc.page_content for doc in cv_results])
 
-    print("Test search: 'Python experience'")
+    return {
+        "job_text" : job_text, 
+        "cv_context": cv_context
+    }
 
-    result = search_cv(vectorstore, 'Python experience')
 
-    for i, doc in enumerate(result):
-        print(f"\n ---Result {i + 1} ----")
-        print(doc.page_content)
