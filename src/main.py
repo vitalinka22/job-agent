@@ -3,6 +3,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from dotenv import load_dotenv
 import os 
 import sys
+from agent import analyze_match
 
 sys.path.append(os.path.dirname(__file__))
 from rag import load_cv, create_vector_store, analyze_job_description
@@ -29,6 +30,9 @@ def main():
 
     result = analyze_job_description(JOB_TEXT, vectorstore)
     print(result["cv_context"])
+    analysis = analyze_match(JOB_TEXT, result["cv_context"])
+
+    print(analysis["analysis"])
 
 if __name__ == "__main__":
     main()
