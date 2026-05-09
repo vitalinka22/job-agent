@@ -45,3 +45,36 @@ def analyze_match(job_text: str, cv_context: str) -> dict:
         "job_text": job_text, 
         "cv_context": cv_context
     }
+
+def generate_cover_letter(job_text: str, cv_context : str) -> str:
+    """
+    Generate a personalized cover letter based on job description and CV.
+    """
+
+    llm = ChatGoogleGenerativeAI(model = "gemini-2.5-flash")
+
+    prompt = f"""
+    You a an expert career coach writing a cover letter.
+
+    Write a shor, personalized cover letter (max 3 paragraphs)
+    for this candidate based on their CV and the job description.
+
+    JOB DESCRIPTION:
+    {job_text}
+
+    RELEVANT CV SECTIONS
+    {cv_context}
+
+    Requirements for the cover letter:
+    - Sound natural and human, not like a robot
+    - Highlight only skills that are actually in the CV
+    - Be specific - mention real projects and experience
+    - Keep it under 200 words
+    - Start with "Dear Hiring Team,"
+    - End with "Best regards, Vitalina Alipova"
+    - Do NOT make up any experience that is not in the CV
+    """
+
+    response = llm.invoke(prompt)
+
+    return response.content

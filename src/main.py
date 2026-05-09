@@ -3,7 +3,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from dotenv import load_dotenv
 import os 
 import sys
-from agent import analyze_match
+from agent import analyze_match, generate_cover_letter
 
 sys.path.append(os.path.dirname(__file__))
 from rag import load_cv, create_vector_store, analyze_job_description
@@ -33,6 +33,16 @@ def main():
     analysis = analyze_match(JOB_TEXT, result["cv_context"])
 
     print(analysis["analysis"])
+
+    # generate cover letter
+
+    print("\n" + "="*50)
+    print("COVER LETTER")
+    print("="*50)
+    cover_letter = generate_cover_letter(JOB_TEXT, result['cv_context'])
+    print(cover_letter)
+
+
 
 if __name__ == "__main__":
     main()
