@@ -7,6 +7,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 from rag import load_cv, create_vector_store, analyze_job_description
 from agent import analyze_match, generate_cover_letter
 
+@st.cache_resource
+def get_vectorstore(file_path: str):
+    chunks = load_cv(file_path)
+    vectorstore = create_vector_store(chunks)
+    return vectorstore
+
 st.set_page_config(
     page_title = "Job Application Agent", 
     page_icon = "🤖", 
@@ -15,6 +21,18 @@ st.set_page_config(
 
 st.title("🤖 Job application Intellegence Agent")
 st.markdown("Upload your CV and paste a job description...")
+
+with st.sidebar:
+    st.header("📖 How to use")
+    st.markdown("""
+    1. Upload your CV as PDF
+    2. Paste the job description
+    3. Click **Analyze Match**
+    4. Get your match score and cover letter!
+    """)
+    st.divider()
+    st.markdown("Built with LangChain + Gemini + ChromaDB")
+
 
 col1, col2 = st.columns(2)
 
@@ -36,12 +54,12 @@ if st.button("🔍 Analyze Match", type = "primary"):
     elif not job_text:
         st.error("Please paste a job description")
     else:
-        with open("data/temp_cv.pdf", "wb") as f:
+        file_path = f"data/{uploaded_file.name}"
+        with open(file_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
         
         with st.spinner("Analyzing your CV against the job description"):
-            chunks = load_cv("data/temp_cv.pdf")
-            vectorstore = create_vector_store(chunks)
+            vectorstore =get_vectorstore(file_path)
             result = analyze_job_description(job_text, vectorstore)
             analysis = analyze_match(job_text, result["cv_context"])
             cover_letter = generate_cover_letter(job_text, result["cv_context"])
