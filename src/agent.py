@@ -7,9 +7,10 @@ def analyze_match(job_text: str, cv_context: str) -> dict:
     llm = ChatGoogleGenerativeAI(model = "gemini-2.5-flash")
 
     prompt = f"""
-    You are an expert career advisor and recruiter.
+    You are a senior recruiter at a top tech company with 10 years of experience.
     
-    Analyze how well this candidate's CV matches the job description.
+    Carefully analyze how well this candidate's CV matches the job description.
+    Be specific and honest - not overly positive.
     
     JOB DESCRIPTION:
     {job_text}
@@ -17,25 +18,22 @@ def analyze_match(job_text: str, cv_context: str) -> dict:
     RELEVANT CV SECTIONS:
     {cv_context}
     
-    Please provide:
-    1. MATCH SCORE: A percentage (0-100%) of how well the CV matches
-    2. MATCHING SKILLS: List skills from the CV that match the job requirements
-    3. MISSING SKILLS: List important skills from the job that are missing in the CV
-    4. SUMMARY: 2-3 sentences explaining the match
+    Provide your analysis in this EXACT format:
     
-    Format your response exactly like this:
     MATCH SCORE: X%
+    (Give a realistic score. 90%+ only for near-perfect matches)
     
     MATCHING SKILLS:
-    - skill 1
-    - skill 2
+    - skill: brief explanation why it matches
     
     MISSING SKILLS:
-    - skill 1
-    - skill 2
+    - skill: why it matters for this role
+    
+    RECOMMENDATIONS:
+    - specific action the candidate can take to improve their application
     
     SUMMARY:
-    Your summary here
+    2-3 honest sentences about the overall fit.
     """
 
     response = llm.invoke(prompt)
